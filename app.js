@@ -1,86 +1,42 @@
-const express=require("express");
+require("dotenv").config();
 
+const express=require("express");
 const app=express();
+
+const mongoose = require('mongoose');
+
 app.use(express.json());
 
-const hotels=[
-    {
-        id:1,
-        name:"hotel1",
-        country:"india",
-        city:"Banglore",
-        price:100,
-        rooms:250,
-        available:10,
-        image:""
-    },
-    {
-        id:2,
-        name:"hotel2",
-        country:"india",
-        city:"Banglore",
-        price:100,
-        rooms:250,
-        available:10,
-        image:""
-    },
-    {
-        id:3,
-        name:"hotel3",
-        country:"india",
-        city:"Banglore",
-        price:100,
-        rooms:250,
-        available:10,
-        image:""
-    },{
-        id:4,
-        name:"hotel4",
-        country:"india",
-        city:"Banglore",
-        price:100,
-        rooms:250,
-        available:10,
-        image:""
-    },{
-        id:5,
-        name:"hotel5",
-        country:"india",
-        city:"Banglore",
-        price:100,
-        rooms:250,
-        available:10,
-        image:""
-    }
 
-]
+const hotelRouter=require("./routes/hotel.js");
+const userRouter=require("./routes/user.js");
+
+
+//logger
+const logger=(req,res,next)=>{
+    console.log(`${req.method} recieved on ${req.url}`)
+    next();
+}
+app.use(logger);
+
+//routes
+app.use("/api/hotels", hotelRouter);
+app.use("/api/users",userRouter);
+
+
+//db connection
+mongoose.connect(process.env.MONGO_URL).then(()=>{
+    console.log("mongo db connected");
+});
+
 
 // create a path
 app.get("/",(req,res)=>{
     console.log(req);
-    res.send("Hello World ");
+    res.send("Hotel World");
 });
 
-app.get("/api/hotels",(req,res)=>{
-    res.send(hotels);
-});
 
-app.get("/api/hotels/:id",(req,res)=>{
-    const id=req.params.id
-    const hotel=hotels.find(hotel=> hotel.id === parseInt(id));
-    res.send(hotel);
-});
-
-app.post('api/hotels',(req,res)=>{
-    console.log(req);
-    const hotel=req.body;
-    hotel.id=hotels.length+1;
-    hotels.add(hotel); 
-
-    
-    res.send(hotels);
-
-});
 
 // make server up on port 3000
 app.listen(3000,(err)=>{
